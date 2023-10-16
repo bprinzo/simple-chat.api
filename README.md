@@ -1,73 +1,201 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Simple Chat API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A simple chat api using websockets implemented using the NestJs framework
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+## Built With
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+* [NestJs](https://docs.nestjs.com/)
 
-## Installation
+## Getting Started
 
-```bash
-$ yarn install
+### Prerequisites
+
+* Node.js
+* Docker
+
+**Node.js v16x**
+
+```
+# Using Ubuntu
+curl -sL https://deb.nodesource.com/setup_15.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+```
+ * Windows download and install the .msi [Node.js](https://nodejs.org/en/)
+**Docker v3.x**
+
+```
+# Using Ubuntu
+sudo apt-get update
+sudo apt-get install ./docker-desktop-<version>-<arch>.deb
+
+```
+ * Windows download and install the .exe [Docker](https://docs.docker.com/desktop/install/windows-install/)
+
+ ### Installation instructions
+
+1. Clone the repo
+
+```git clone https://github.com/bprinzo/simple-chat.api```
+
+2. Install Yarn packages
+
+```
+yarn
+```
+3. Create a yml docker-compose file on a upper level than the project folder with the following configs
+```
+version: "3"
+services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: simple_chat
+      POSTGRES_DB: simple_chat
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres-simple_chat-data:/var/lib/postgresql/data
+    networks:
+      - simple-chat-network
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com.br
+      PGADMIN_DEFAULT_PASSWORD: admin
+    restart: unless-stopped
+    ports:
+      - 16543:80
+    depends_on:
+      - postgres
+    networks:
+      - simple-chat-network
+  api:
+    build:
+      context: simple-chat.api
+      dockerfile: Dockerfile
+    command: yarn start:dev
+    restart: on-failure
+    ports:
+      - 3333:3333
+    env_file:
+      - ./simple-chat.api/.env
+    volumes:
+      - ./usr/src/app:/api
+    networks:
+      - simple-chat-network
+
+  front:
+    build:
+      context: simple-chat.site
+      dockerfile: Dockerfile
+    command: yarn dev
+    restart: on-failure
+    ports:
+      - 3000:3000
+    env_file:
+      - ./simple-chat.site/.env
+    volumes:
+      - ./usr/src/app:/site
+    networks:
+      - simple-chat-network
+volumes:
+  postgres-simple_chat-data:
+    driver: local
+networks:
+  simple-chat-network:
+```
+4. Create the containers using the command
+```
+docker-compose up -d
+```
+If running locally disable the sistemas-distribuidos-project_front and sistemas-distribuidos-project_api to avoid port conflicts
+
+6. Start the Application
+```
+yarn start:dev
 ```
 
-## Running the app
+ ### Container instructions
+ 1. Clone the repo repos
 
-```bash
-# development
-$ yarn run start
+```git clone https://github.com/bprinzo/simple-chat.api```
+and
+```git clone https://github.com/bprinzo/simple-chat.site```
 
-# watch mode
-$ yarn run start:dev
+2. Install Yarn packages of both projects by going to the newly created directory
 
-# production mode
-$ yarn run start:prod
 ```
-
-## Test
-
-```bash
-# unit tests
-$ yarn run test
-
-# e2e tests
-$ yarn run test:e2e
-
-# test coverage
-$ yarn run test:cov
+yarn
 ```
+3. Create a yml docker-compose file on a upper level than both of the projects folders with the following configs
+```
+version: "3"
+services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: simple_chat
+      POSTGRES_DB: simple_chat
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres-simple_chat-data:/var/lib/postgresql/data
+    networks:
+      - simple-chat-network
 
-## Support
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com.br
+      PGADMIN_DEFAULT_PASSWORD: admin
+    restart: unless-stopped
+    ports:
+      - 16543:80
+    depends_on:
+      - postgres
+    networks:
+      - simple-chat-network
+  api:
+    build:
+      context: simple-chat.api
+      dockerfile: Dockerfile
+    command: yarn start:dev
+    restart: on-failure
+    ports:
+      - 3333:3333
+    env_file:
+      - ./simple-chat.api/.env
+    volumes:
+      - ./usr/src/app:/api
+    networks:
+      - simple-chat-network
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+  front:
+    build:
+      context: simple-chat.site
+      dockerfile: Dockerfile
+    command: yarn dev
+    restart: on-failure
+    ports:
+      - 3000:3000
+    env_file:
+      - ./simple-chat.site/.env
+    volumes:
+      - ./usr/src/app:/site
+    networks:
+      - simple-chat-network
+volumes:
+  postgres-simple_chat-data:
+    driver: local
+networks:
+  simple-chat-network:
+```
+4. Create the containers using the command
+```
+docker-compose up -d
+```
