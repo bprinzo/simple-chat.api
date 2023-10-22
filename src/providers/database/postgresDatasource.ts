@@ -12,10 +12,10 @@ const PostgresDataSource = new DataSource({
   password: process.env.DATABASE_PASSWORD,
   logging: false,
   database: process.env.DATABASE_NAME,
-  entities: [__dirname + '/../**/*.entity.{ts,js}'],
+  entities: [__dirname + '/../../**/*.entity.{ts,js}'],
   migrations: [__dirname + '/../migrations/**/*{.ts,.js}'],
   migrationsRun: true,
-  //synchronize: true,
+  synchronize: true,
 });
 
 export default PostgresDataSource;
