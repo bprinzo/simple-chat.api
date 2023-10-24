@@ -1,4 +1,21 @@
-import { OmitType } from '@nestjs/mapped-types';
-import { SignupDto } from './signup.dto';
+import { ApiProperty } from '@nestjs/swagger';
+import {
+    IsEmail,
+    IsNotEmpty,
+    IsString,
+    MaxLength,
+    MinLength,
+} from 'class-validator';
+export class SigninDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
 
-export class SigninDto extends OmitType(SignupDto, ['name'] as const) {}
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsString()
+  @MinLength(8)
+  @MaxLength(100)
+  password: string;
+}
