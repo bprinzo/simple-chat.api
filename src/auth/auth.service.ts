@@ -1,26 +1,45 @@
-import { Injectable } from '@nestjs/common';
-import { CreateAuthDto } from './dto/create-auth.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { UserService } from 'src/user/user.service';
+import { SigninDto } from './dto/signin.dto';
+import { SignupDto } from './dto/signup.dto';
 
 @Injectable()
 export class AuthService {
-  create(createAuthDto: CreateAuthDto) {
-    return 'This action adds a new auth';
+  constructor(
+    private readonly jwtService: JwtService,
+    private readonly userService: UserService,
+  ) {}
+
+  async signup(signupDto: SignupDto) {
+    const user = await this.userService.create(signupDto);
+    const token = this.generateToken(user.id);
+    return { user, token };
   }
 
-  findAll() {
-    return `This action returns all auth`;
+  async signin(signinDto: SigninDto) {
+    const user = await this.userService.getUserByEmail(signinDto.email);
+    if (!user) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+    const isPasswordValid = user.comparePassword(signinDto.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+    const token = this.generateToken(user.id);
+    return { user, token };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
+  check({ token }: { token: string }) {
+    return token;
   }
 
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
+  generateToken(userId: string) {
+    const payload = { user: { id: userId } };
+    return this.jwtService.sign(payload);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+  verifyToken(token: string) {
+    return this.jwtService.verify(token);
   }
 }
