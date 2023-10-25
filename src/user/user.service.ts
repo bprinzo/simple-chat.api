@@ -66,12 +66,20 @@ export class UserService {
     return this.userRepository.findOneBy({ email });
   }
 
-  searchUsers(searchUsersDto: SearchUsersDto) {
-    return this.userRepository.find({
-      where: { name: searchUsersDto.name },
-      skip: searchUsersDto.skip,
-      take: searchUsersDto.take,
-    });
+  async searchUsers(searchUsersDto: SearchUsersDto) {
+    const qb = this.userRepository.createQueryBuilder('user');
+
+    if (searchUsersDto.name) {
+      qb.andWhere('user.name ILIKE :name', {
+        name: `%${searchUsersDto.name}%`,
+      });
+    }
+
+    const [items, count] = await qb
+      .skip(searchUsersDto.skip)
+      .take(searchUsersDto.take)
+      .getManyAndCount();
+    return { items, count };
   }
 
   async updatePassword(id: string, updatePasswordDto: UpdatePasswordDto) {

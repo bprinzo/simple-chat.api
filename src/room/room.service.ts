@@ -61,12 +61,7 @@ export class RoomService {
 
   async searchRooms(searchRoomsDto: SearchRoomsDto) {
     const qb = this.roomRepository.createQueryBuilder('rooms');
-    if (searchRoomsDto.skip) {
-      qb.skip(searchRoomsDto.skip);
-    }
-    if (searchRoomsDto.take) {
-      qb.take(searchRoomsDto.take);
-    }
+
     if (searchRoomsDto.title) {
       qb.andWhere('rooms.title ILIKE :title', {
         title: `%${searchRoomsDto.title}%`,
@@ -77,7 +72,10 @@ export class RoomService {
         ownerId: searchRoomsDto.ownerId,
       });
     }
-    const [items, count] = await qb.getManyAndCount();
+    const [items, count] = await qb
+      .skip(searchRoomsDto.skip)
+      .take(searchRoomsDto.take)
+      .getManyAndCount();
     return { items, count };
   }
 }

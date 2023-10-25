@@ -25,17 +25,16 @@ export class UserController {
   findAll() {
     return this.userService.findAll();
   }
+  @Get('search')
+  @JwtAuth()
+  searchUsers(@Query() searchUsersDto: SearchUsersDto) {
+    return this.userService.searchUsers(searchUsersDto);
+  }
 
   @Get(':id')
   @JwtAuth()
   findOne(@Param('id') id: string) {
     return this.userService.findOne(id);
-  }
-
-  @Get('search')
-  @JwtAuth()
-  searchUsers(@Query() searchUsersDto: SearchUsersDto) {
-    return this.userService.searchUsers(searchUsersDto);
   }
 
   @Patch()

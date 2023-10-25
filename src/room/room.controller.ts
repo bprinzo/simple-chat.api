@@ -34,15 +34,16 @@ export class RoomController {
   findAll(@Query() getRoomsDto: GetRoomsDto) {
     return this.roomService.findAll(getRoomsDto);
   }
+  @Get('search')
+  @JwtAuth()
+  searchRooms(@Query() searchRoomsDto: SearchRoomsDto) {
+    return this.roomService.searchRooms(searchRoomsDto);
+  }
 
   @Get(':id')
   @JwtAuth()
   findOne(@Param('id') id: string) {
     return this.roomService.findOne(id);
-  }
-  @Get('search')
-  searchRooms(@Query() searchRoomsDto: SearchRoomsDto) {
-    return this.roomService.searchRooms(searchRoomsDto);
   }
 
   @Patch(':id')

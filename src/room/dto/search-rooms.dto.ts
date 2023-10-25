@@ -11,5 +11,5 @@ export class SearchRoomsDto extends PaginationDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
-  ownerId?: number;
+  ownerId?: string;
 }
