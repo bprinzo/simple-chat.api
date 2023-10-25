@@ -1,34 +1,64 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { RoomService } from './room.service';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Request,
+} from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+import { JwtAuth } from 'src/common/decorators/jwt_auth.decorator';
 import { CreateRoomDto } from './dto/create-room.dto';
+import { GetRoomsDto } from './dto/get-rooms.dto';
+import { SearchRoomsDto } from './dto/search-rooms.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
+import { RoomService } from './room.service';
 
 @Controller('room')
+@ApiTags('Room')
 export class RoomController {
   constructor(private readonly roomService: RoomService) {}
 
   @Post()
-  create(@Body() createRoomDto: CreateRoomDto) {
-    return this.roomService.create(createRoomDto);
+  @JwtAuth()
+  create(@Body() createRoomDto: CreateRoomDto, @Request() req: any) {
+    const userId: string = req.user.userId;
+    return this.roomService.create(createRoomDto, userId);
   }
 
   @Get()
-  findAll() {
-    return this.roomService.findAll();
+  @JwtAuth()
+  findAll(@Query() getRoomsDto: GetRoomsDto) {
+    return this.roomService.findAll(getRoomsDto);
   }
 
   @Get(':id')
+  @JwtAuth()
   findOne(@Param('id') id: string) {
-    return this.roomService.findOne(+id);
+    return this.roomService.findOne(id);
+  }
+  @Get('search')
+  searchRooms(@Query() searchRoomsDto: SearchRoomsDto) {
+    return this.roomService.searchRooms(searchRoomsDto);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateRoomDto: UpdateRoomDto) {
-    return this.roomService.update(+id, updateRoomDto);
+  @JwtAuth()
+  update(
+    @Param('id') id: string,
+    @Body() updateRoomDto: UpdateRoomDto,
+    @Request() req: any,
+  ) {
+    const userId: string = req.user.userId;
+    return this.roomService.update(id, updateRoomDto, userId);
   }
 
   @Delete(':id')
+  @JwtAuth()
   remove(@Param('id') id: string) {
-    return this.roomService.remove(+id);
+    return this.roomService.remove(id);
   }
 }
