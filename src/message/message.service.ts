@@ -1,26 +1,35 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Message } from 'src/entities/message/message.entity';
+import { Repository } from 'typeorm';
 import { CreateMessageDto } from './dto/create-message.dto';
-import { UpdateMessageDto } from './dto/update-message.dto';
+import { GetMessagesDto } from './dto/get-message.dto';
 
 @Injectable()
 export class MessageService {
-  create(createMessageDto: CreateMessageDto) {
-    return 'This action adds a new message';
+  constructor(
+    @InjectRepository(Message)
+    private readonly messageRepository: Repository<Message>,
+  ) {}
+  async create(createMessageDto: CreateMessageDto, userId: string) {
+    const message = this.messageRepository.create({
+      content: createMessageDto.content,
+      room: { id: createMessageDto.roomId },
+      owner: { id: userId },
+    });
+    await this.messageRepository.save(message);
+    return message;
   }
 
-  findAll() {
-    return `This action returns all message`;
-  }
+  async findAllByRoom(getMessagesDto: GetMessagesDto) {
+    const qb = this.messageRepository
+      .createQueryBuilder('message')
+      .where('message.roomId = :roomId', { roomId: getMessagesDto.roomId });
 
-  findOne(id: number) {
-    return `This action returns a #${id} message`;
-  }
-
-  update(id: number, updateMessageDto: UpdateMessageDto) {
-    return `This action updates a #${id} message`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} message`;
+    const [items, count] = await qb
+      .skip(getMessagesDto.skip)
+      .take(getMessagesDto.take)
+      .getManyAndCount();
+    return { items, count };
   }
 }
