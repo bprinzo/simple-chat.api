@@ -21,6 +21,7 @@ export class ChatService implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
   async handleConnection(client: Socket) {
     const user = await this.getUser(client);
+    console.log(user);
     if (!user) this.handleDisconnect(client);
     else {
       console.log(`Client ${client.id} connected. Id: ${user.userId}`);
@@ -65,6 +66,9 @@ export class ChatService implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async getUser(client: Socket): Promise<{ userId: string } | null> {
+    // for testing on postman
+    // const token = client.handshake.headers['auth'] as string;
+    // for frontend integration
     const token = client.handshake.auth.token;
 
     if (!token) {
