@@ -6,7 +6,11 @@ async function bootstrap() {
   console.log(process.env.API_SERVER_PORT);
 
   const app = await NestFactory.create(AppModule);
-  app.enableCors();
+  app.enableCors({
+    allowedHeaders: '*',
+    origin: '*',
+    credentials: true,
+  });
   const documentConfig = new DocumentBuilder()
     .setTitle('Simple Chat Api')
     .setDescription('The Simple Chat API description')
