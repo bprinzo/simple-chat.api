@@ -27,7 +27,8 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
     const token = this.generateToken(user.id);
-    return { user, token };
+    const { password, ...userRest } = user;
+    return { user: userRest, token };
   }
 
   check({ token }: { token: string }) {
