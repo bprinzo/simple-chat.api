@@ -63,7 +63,11 @@ export class UserService {
   }
 
   getUserByEmail(email: string) {
-    return this.userRepository.findOneBy({ email });
+    return this.userRepository
+      .createQueryBuilder('user')
+      .addSelect('user.password')
+      .where('user.email = :email', { email })
+      .getOne();
   }
 
   async searchUsers(searchUsersDto: SearchUsersDto) {
@@ -84,7 +88,11 @@ export class UserService {
 
   async updatePassword(id: string, updatePasswordDto: UpdatePasswordDto) {
     const { oldPassword, newPassword } = updatePasswordDto;
-    const user = await this.userRepository.findOneBy({ id });
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .addSelect('user.password')
+      .where('user.id = :id', { id })
+      .getOne();
     if (!user) {
       throw new NotFoundException(`User with id ${id} not found`);
     }
