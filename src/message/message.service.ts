@@ -22,14 +22,15 @@ export class MessageService {
   }
 
   async findAllByRoom(getMessagesDto: GetMessagesDto) {
-    const qb = this.messageRepository
+    let qb = this.messageRepository
       .createQueryBuilder('message')
+      .leftJoinAndSelect('message.owner', 'owner')
       .where('message.roomId = :roomId', { roomId: getMessagesDto.roomId });
 
-    const [items, count] = await qb
-      .skip(getMessagesDto.skip)
-      .take(getMessagesDto.take)
-      .getManyAndCount();
+    if (getMessagesDto.skip && getMessagesDto.take) {
+      qb = qb.skip(getMessagesDto.skip).take(getMessagesDto.take);
+    }
+    const [items, count] = await qb.getManyAndCount();
     return { items, count };
   }
 }

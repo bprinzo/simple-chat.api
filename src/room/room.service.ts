@@ -24,12 +24,14 @@ export class RoomService {
     return roomSaved;
   }
 
-  findAll(getRoomsDto: GetRoomsDto) {
-    return this.roomRepository.find({
-      skip: getRoomsDto.skip,
-      take: getRoomsDto.take,
-      order: { createdAt: 'DESC' },
-    });
+  async findAll(getRoomsDto: GetRoomsDto) {
+    let qb = this.roomRepository.createQueryBuilder('rooms');
+
+    if (getRoomsDto.skip && getRoomsDto.take) {
+      qb = qb.skip(getRoomsDto.skip).take(getRoomsDto.take);
+    }
+    const rooms = await qb.orderBy('rooms.createdAt', 'DESC').getMany();
+    return rooms;
   }
 
   findOne(id: string) {
@@ -72,10 +74,10 @@ export class RoomService {
         ownerId: searchRoomsDto.ownerId,
       });
     }
-    const [items, count] = await qb
-      .skip(searchRoomsDto.skip)
-      .take(searchRoomsDto.take)
-      .getManyAndCount();
+    if (searchRoomsDto.skip && searchRoomsDto.take) {
+      qb.skip(searchRoomsDto.skip).take(searchRoomsDto.take);
+    }
+    const [items, count] = await qb.getManyAndCount();
     return { items, count };
   }
 }
