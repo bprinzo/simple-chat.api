@@ -23,9 +23,12 @@ sudo apt-get install -y nodejs
 
 ```
  * Windows download and install the .msi [Node.js](https://nodejs.org/en/)
+
+
 **Docker v3.x**
 
 ```
+
 # Using Ubuntu
 sudo apt-get update
 sudo apt-get install ./docker-desktop-<version>-<arch>.deb
@@ -44,6 +47,13 @@ sudo apt-get install ./docker-desktop-<version>-<arch>.deb
 ```
 yarn
 ```
+
+  Or with Npm:
+  ```
+  npm install
+  ``` 
+
+
 3. Create a yml docker-compose file on a upper level than the project folder with the following configs
 ```
 version: "3"
@@ -108,6 +118,15 @@ volumes:
 networks:
   simple-chat-network:
 ```
+The folder structure of the project should look like the following
+
+```
+.
+└── root/
+    ├── docker-compose.yml
+    └── simple-chat.api/
+```
+
 4. Create the containers using the command
 ```
 docker-compose up -d
@@ -118,6 +137,11 @@ If running locally disable the sistemas-distribuidos-project_front and sistemas-
 ```
 yarn start:dev
 ```
+  Or with npm
+  ```
+  npm run start:dev
+  ```
+
 
  ### Container instructions
  1. Clone the repo repos
@@ -131,6 +155,10 @@ and
 ```
 yarn
 ```
+  Or with Npm:
+  ```
+  npm install
+  ``` 
 3. Create a yml docker-compose file on a upper level than both of the projects folders with the following configs
 ```
 version: "3"
@@ -195,6 +223,16 @@ volumes:
 networks:
   simple-chat-network:
 ```
+The folder structure of the project should look like the following
+
+```
+.
+└── root/
+    ├── docker-compose.yml
+    ├── simple-chat.site/
+    └── simple-chat.api/
+```
+
 4. Create the containers using the command
 ```
 docker-compose up -d
