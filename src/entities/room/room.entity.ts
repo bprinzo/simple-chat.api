@@ -26,7 +26,7 @@ export class Room extends BaseEntity<Room> {
   owner: User;
 
   @ApiProperty()
-  @ManyToMany(() => User, (user) => user.joinedRooms)
+  @ManyToMany(() => User, (user) => user.joinedRooms, { onDelete: 'CASCADE' })
   @JoinTable()
   members: User[];
 }

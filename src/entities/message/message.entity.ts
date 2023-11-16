@@ -9,9 +9,9 @@ export class Message extends BaseEntity<Message> {
   @Column()
   content: string;
   @ApiProperty()
-  @ManyToOne(() => Room, (room) => room.messages)
+  @ManyToOne(() => Room, (room) => room.messages, { onDelete: 'CASCADE' })
   room: Room;
   @ApiProperty()
-  @ManyToOne(() => User, (user) => user.messages)
+  @ManyToOne(() => User, (user) => user.messages, { onDelete: 'CASCADE' })
   owner: User;
 }

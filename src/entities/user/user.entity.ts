@@ -23,7 +23,7 @@ export class User extends BaseEntity<User> {
   rooms: Room[];
 
   @ApiProperty()
-  @ManyToMany(() => Room, (room) => room.members)
+  @ManyToMany(() => Room, (room) => room.members, { onDelete: 'CASCADE' })
   joinedRooms: Room[];
 
   @ApiProperty()
